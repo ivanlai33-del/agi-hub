@@ -25,13 +25,16 @@ export const BackgroundSlideshow: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         <motion.div
           key={backgrounds[bgIndex]}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.5 }}
+          initial={{ opacity: 0, scale: 1 }}
+          animate={{ opacity: 0.5, scale: 1.15 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 3 }}
+          transition={{ 
+            opacity: { duration: 3 },
+            scale: { duration: 12, ease: "linear" } 
+          }}
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${backgrounds[bgIndex]})` }}
         />
