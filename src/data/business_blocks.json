@@ -1,0 +1,57 @@
+[
+  {
+    "block_id": "booking_core",
+    "name": "預約核心積木",
+    "strategy": "REFINING",
+    "handoff_policy": "collect_and_pass",
+    "used_by": ["rich_menu:book_now", "intent:booking", "quick_reply:reserve"],
+    "related": ["member_bind", "service_catalog", "human_handoff"],
+    "rules": [
+      "must_identify_user_before_confirming_booking",
+      "do_not_confirm_if_time_slot_unavailable",
+      "send_reminder_24h_before_booking"
+    ],
+    "entry_signals": ["我想預約", "還有位子嗎", "可以約今天晚上嗎"],
+    "next_steps": ["booking_confirmed", "collect_contact_form", "handoff_to_staff"],
+    "message": "if user asks for custom time, flag manual_review",
+    "wiki": "docs/booking-playbook.md",
+    "bd_value": "high",
+    "fallback": ["ask_clarifying_question", "human_handoff"]
+  },
+  {
+    "block_id": "human_handoff_core",
+    "name": "人工轉接積木",
+    "strategy": "DIRECT",
+    "handoff_policy": "instant_alert",
+    "used_by": ["intent:complaint", "intent:dispute", "low_confidence"],
+    "related": ["admin_notification", "crm_ticket_system"],
+    "rules": [
+      "generate_context_summary_before_handoff",
+      "tag_as_high_priority_if_emotional_detected",
+      "notify_staff_via_push_notification"
+    ],
+    "entry_signals": ["我要投訴", "退錢", "找真人", "不滿意"],
+    "next_steps": ["ticket_created", "staff_assigned"],
+    "message": "AI self-admit uncertainty and promise human response within 15min",
+    "wiki": "docs/handoff-protocol.md",
+    "bd_value": "medium",
+    "fallback": ["general_faq"]
+  },
+  {
+    "block_id": "bd_lead_capture",
+    "name": "BD 商機捕捉積木",
+    "used_by": ["intent:pricing", "intent:demo", "high_score_lead"],
+    "related": ["crm_sync", "lead_scoring", "sales_notification"],
+    "rules": [
+      "collect_company_name_and_role",
+      "validate_phone_format",
+      "check_budget_range_naturally"
+    ],
+    "entry_signals": ["怎麼收費", "可以試用嗎", "有簡報嗎", "我想合作"],
+    "next_steps": ["schedule_demo", "send_proposal", "assign_to_sales"],
+    "message": "Verify industry type to assign correct sales specialist",
+    "wiki": "docs/sales-playbook.md",
+    "bd_value": "critical",
+    "fallback": ["general_faq", "human_handoff"]
+  }
+]

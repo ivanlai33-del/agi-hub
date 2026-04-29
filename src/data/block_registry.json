@@ -1,0 +1,139 @@
+{
+  "domains": [
+    "Entrance",
+    "Identity",
+    "Judgment",
+    "Execution",
+    "BD",
+    "Automation",
+    "Memory",
+    "Governance"
+  ],
+  "blocks": [
+    {
+      "block_id": "persona_store_manager_v1",
+      "domain": "PERSONA",
+      "name": "店長角色積木",
+      "type": "Identity_Provider",
+      "priority": 100,
+      "logic_rules": {
+        "mission": "門店營運與客情維護",
+        "tone": "專業且溫暖",
+        "allowed_blocks": ["faq", "booking", "form"],
+        "forbidden_actions": ["make_legal_promise"]
+      },
+      "ui_wrapper": "/persona/store-manager",
+      "version": "1.2.4"
+    },
+    {
+      "block_id": "persona_risk_guard_v1",
+      "domain": "PERSONA",
+      "name": "風險守門員角色積木",
+      "type": "Identity_Provider",
+      "priority": 100,
+      "logic_rules": {
+        "mission": "安全合規與爭議緩解",
+        "tone": "冷靜精準",
+        "allowed_blocks": ["risk_guard", "legal_audit"]
+      },
+      "ui_wrapper": "/persona/risk-guard",
+      "version": "1.0.0"
+    },
+    {
+      "block_id": "risk_guard_v1",
+      "domain": "Judgment",
+      "name": "高風險防禦層",
+      "priority": 100,
+      "mutex_group": "global_response",
+      "owns_states": ["risk_case_status"],
+      "reads_states": ["conversation_history", "sentiment_score"],
+      "writes_events": ["risk_detected", "handoff_triggered"],
+      "fallback_rule": "instant_human_handoff",
+      "version": "2.1.0",
+      "policy_scope": "safety_first"
+    },
+    {
+      "block_id": "booking_engine_v1",
+      "domain": "Execution",
+      "name": "預約執行積木",
+      "priority": 80,
+      "mutex_group": "transactional_flow",
+      "owns_states": ["booking_status", "time_slot_reservation"],
+      "reads_states": ["customer_profile", "service_catalog"],
+      "writes_events": ["booking_confirmed", "lead_scored"],
+      "fallback_rule": "clarifying_question",
+      "version": "1.5.2",
+      "policy_scope": "transactional_consistency"
+    },
+    {
+      "block_id": "bd_scoring_v1",
+      "domain": "BD",
+      "name": "商機價值判定積木",
+      "type": "Logic_Provider",
+      "priority": 60,
+      "mutex_group": "marketing_flow",
+      "logic_rules": {
+        "high_intent_keywords": ["報價", "導入", "方案", "大量", "加盟"],
+        "scoring_matrix": { "ask_pricing": 10, "request_demo": 30, "leave_phone": 50 }
+      },
+      "owns_states": ["decision_metadata"],
+      "reads_states": ["customer_context_snapshot"],
+      "writes_events": ["lead_signal_detected", "task_trigger_sent"],
+      "external_target": "BD_MIDDLEWARE",
+      "version": "1.2.0"
+    },
+    {
+      "block_id": "persona_sales_v1",
+      "domain": "PERSONA",
+      "name": "金牌銷售員角色積木",
+      "type": "Identity_Provider",
+      "priority": 100,
+      "logic_rules": {
+        "mission": "高價值商機轉化與產品推薦",
+        "tone": "自信、具有說服力",
+        "allowed_blocks": ["bd_scoring", "product_catalog", "discount_engine"],
+        "forbidden_actions": ["low_price_dumping"]
+      },
+      "ui_wrapper": "/persona/sales",
+      "version": "1.0.5"
+    },
+    {
+      "block_id": "intent_routing_v2",
+      "domain": "Entrance",
+      "name": "全域意圖路由中心",
+      "priority": 200,
+      "mutex_group": "entrance_layer",
+      "owns_states": ["current_intent", "routing_target"],
+      "reads_states": ["raw_message"],
+      "writes_events": ["intent_mapped", "handoff_initiated"],
+      "fallback_rule": "general_assistant_handoff",
+      "version": "2.4.0"
+    },
+    {
+      "block_id": "sentiment_analysis_v1",
+      "domain": "Judgment",
+      "name": "情感溫度計模組",
+      "priority": 90,
+      "logic_rules": {
+        "negative_threshold": 0.3,
+        "escalation_triggers": ["憤怒", "投訴", "欺騙"]
+      },
+      "owns_states": ["sentiment_score"],
+      "writes_events": ["negative_sentiment_alert"],
+      "version": "1.1.0"
+    },
+    {
+      "block_id": "crm_sync_v1",
+      "domain": "Automation",
+      "name": "CRM 資料同步工具",
+      "type": "Data_Bridge",
+      "priority": 50,
+      "logic_rules": {
+        "target_system": "Salesforce/Hubspot",
+        "fields": ["name", "email", "phone", "intent_tag"]
+      },
+      "writes_events": ["crm_record_created"],
+      "version": "1.0.0"
+    }
+  ]
+}

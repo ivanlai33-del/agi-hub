@@ -1,0 +1,40 @@
+{
+  "platform_core": {
+    "version": "2.0.0",
+    "global_rules": ["Risk First", "Human Escalation"],
+    "base_blocks": ["risk_guard", "handoff_core", "identity_binder"]
+  },
+  "project_brain_packs": [
+    {
+      "pack_id": "line_retail_v1",
+      "name": "LINE 零售導航包",
+      "base_version": "2.0.0",
+      "specialized_blocks": ["intent_router", "catalog_explorer", "lead_capture"],
+      "default_overlay": {
+        "channel": "line",
+        "ui_mode": "flex_message"
+      }
+    },
+    {
+      "pack_id": "web_booking_v2",
+      "name": "Web 預約導航包",
+      "base_version": "2.0.0",
+      "specialized_blocks": ["booking_engine", "slot_validator", "payment_bridge"],
+      "default_overlay": {
+        "channel": "web",
+        "ui_mode": "liff_style"
+      }
+    }
+  ],
+  "tenant_overlays": [
+    {
+      "tenant_id": "store_001",
+      "pack_id": "line_retail_v1",
+      "pinned_version": "v1.2.4",
+      "overrides": {
+        "brand_voice": "Friendly",
+        "office_hours": "09:00-18:00"
+      }
+    }
+  ]
+}

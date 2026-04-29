@@ -1,0 +1,45 @@
+[
+  {
+    "block_id": "refund_dispute_guard",
+    "risk_type": "refund_dispute",
+    "risk_level": "L3",
+    "policy_version": "2026.04.29.v1",
+    "trigger_signals": ["退款", "退費", "爭議", "檢舉", "差評", "消保"],
+    "ai_can_do": [
+      "collect order_id",
+      "collect issue_summary",
+      "ask desired_resolution",
+      "explain official review process"
+    ],
+    "ai_must_not_do": [
+      "promise refund approval",
+      "offer extra compensation",
+      "reinterpret company policy"
+    ],
+    "required_fields": ["customer_name", "order_id", "issue_type"],
+    "handoff_to": "support_manager",
+    "handoff_priority": "high",
+    "audit_log": ["sentiment_score", "detected_keywords", "policy_version"]
+  },
+  {
+    "block_id": "legal_privacy_guard",
+    "risk_type": "legal_sensitivity",
+    "risk_level": "L4",
+    "policy_version": "2026.04.29.v1",
+    "trigger_signals": ["法律", "訴訟", "告你", "律師", "個資", "隱私", "外洩"],
+    "ai_can_do": [
+      "express empathy",
+      "confirm receiving the concern",
+      "inform that a human specialist will follow up immediately"
+    ],
+    "ai_must_not_do": [
+      "admit fault or liability",
+      "provide legal opinions",
+      "share any internal log or data in chat"
+    ],
+    "required_fields": ["topic", "contact_method"],
+    "handoff_to": "legal_compliance_team",
+    "handoff_priority": "critical",
+    "audit_log": ["transcript_hash", "timestamp", "risk_level"]
+  }
+]

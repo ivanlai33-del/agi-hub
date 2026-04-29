@@ -36,7 +36,7 @@ export const BackgroundSlideshow: React.FC = () => {
         <motion.div
           key={backgrounds[bgIndex]}
           initial={{ opacity: 0, scale: 1 }}
-          animate={{ opacity: 0.8, scale: 1.15 }}
+          animate={{ opacity: 0.5, scale: 1.15 }}
           exit={{ opacity: 0 }}
           transition={{ 
             opacity: { duration: 3 },
@@ -47,8 +47,8 @@ export const BackgroundSlideshow: React.FC = () => {
         />
       </AnimatePresence>
       
-      {/* Dark Overlay for Legibility - Lightened to show background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/60 z-[1]" />
+      {/* Dark Overlay for Legibility - Fixed at 50% for consistent transparency */}
+      <div className="absolute inset-0 bg-black/50 z-[1]" />
       
       {/* Atmosphere Glows - Using hardware acceleration */}
       <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-emerald-500/10 blur-[140px] rounded-full animate-pulse z-[2] will-change-opacity" />

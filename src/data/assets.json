@@ -1,0 +1,36 @@
+[
+  {
+    "asset_id": "ast_line_001",
+    "name": "捷報 Estimator Pro (LINE)",
+    "project_id": "prj_retail_automation",
+    "tenant_id": "t_ycideas_01",
+    "channel": "line",
+    "status": "online",
+    "last_seen_at": "2026-04-29T12:00:00Z",
+    "brain_pack_version": "v1.2.4",
+    "risk_policy_version": "v1.0.0",
+    "api_key": "agi_hub_test_key_001",
+    "metrics": {
+      "today_events": 142,
+      "handoff_rate": "5%",
+      "error_rate": "0.1%"
+    }
+  },
+  {
+    "asset_id": "ast_web_002",
+    "name": "官網智能導購 (Web)",
+    "project_id": "prj_web_commerce",
+    "tenant_id": "t_client_abc",
+    "channel": "web",
+    "status": "alert",
+    "last_seen_at": "2026-04-29T11:45:00Z",
+    "brain_pack_version": "v1.1.0",
+    "risk_policy_version": "v1.0.0",
+    "api_key": "agi_hub_web_key_999",
+    "metrics": {
+      "today_events": 850,
+      "handoff_rate": "12%",
+      "error_rate": "2.5%"
+    }
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "id": "cap_faq",
+    "name": "智庫回答 (FAQ)",
+    "trigger": "使用者詢問一般性問題或知識",
+    "destination": "Knowledge Block",
+    "returns": ["related_links", "confidence_score"]
+  },
+  {
+    "id": "cap_product",
+    "name": "商品推薦 (Catalog)",
+    "trigger": "提及找商品、買東西、看目錄",
+    "destination": "Product Block / Rich Menu",
+    "returns": ["product_ids", "category"]
+  },
+  {
+    "id": "cap_booking",
+    "name": "預約排程 (Booking)",
+    "trigger": "提及預約、看時間、掛號",
+    "destination": "Booking Block / LIFF",
+    "returns": ["booking_time", "service_type"]
+  },
+  {
+    "id": "cap_lead",
+    "name": "商機收資 (Leads)",
+    "trigger": "潛在客戶留下需求、詢價、索取簡報",
+    "destination": "BD Block / Form",
+    "returns": ["contact_info", "demand_level"]
+  },
+  {
+    "id": "cap_human",
+    "name": "人工客服 (Handoff)",
+    "trigger": "情緒激烈、退款、客訴、AI 無法回答",
+    "destination": "Human Handoff Console",
+    "returns": ["priority", "issue_summary"]
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "integration_id": "intg_line_retail_001",
+    "name": "LINE 零售店長 (生產環境)",
+    "tenant_id": "t_ycideas_01",
+    "environment": "prod",
+    "auth_type": "api_key",
+    "api_key_hash": "agi_hash_example_888999",
+    "scopes": [
+      "brains:read",
+      "thoughtflow:execute",
+      "events:write",
+      "telemetry:write"
+    ],
+    "allowed_brain_packs": ["retail_navigator_v1"],
+    "allowed_persona_packs": ["ps_store_manager_v1"],
+    "rate_limit": 60,
+    "monthly_quota": 50000,
+    "allowed_ips": ["*"],
+    "status": "active",
+    "created_at": "2026-04-29T14:00:00Z",
+    "last_used_at": "2026-04-29T14:15:00Z"
+  },
+  {
+    "integration_id": "intg_web_dev_002",
+    "name": "官網導購測試 (開發環境)",
+    "tenant_id": "t_client_abc",
+    "environment": "dev",
+    "auth_type": "service_account",
+    "api_key_hash": "agi_hash_example_dev_111",
+    "scopes": [
+      "brains:read",
+      "brains:bind",
+      "thoughtflow:execute"
+    ],
+    "allowed_brain_packs": ["*"],
+    "allowed_persona_packs": ["*"],
+    "rate_limit": 1000,
+    "monthly_quota": 1000000,
+    "allowed_origins": ["localhost:3000", "dev.brand.com"],
+    "status": "active",
+    "created_at": "2026-04-29T10:00:00Z"
+  }
+]
