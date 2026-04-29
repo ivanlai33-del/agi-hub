@@ -57,16 +57,26 @@ export const PureChat: React.FC = () => {
 
       const data = await response.json();
 
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Unknown Error');
+      }
+
       const agiMsg: Message = {
         role: 'agi',
-        content: data.content || '正在調研全球職人智庫...',
+        content: data.content,
         timestamp: new Date().toLocaleTimeString(),
         blocks: data.suggested_blocks,
       };
 
       setMessages((prev) => [...prev, agiMsg]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Hub Link Broken', error);
+      const errorMsg: Message = {
+        role: 'agi',
+        content: `⚠️ 系統連線中斷: ${error.message}。請檢查 API 金鑰設定。`,
+        timestamp: new Date().toLocaleTimeString(),
+      };
+      setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
     }
@@ -75,11 +85,11 @@ export const PureChat: React.FC = () => {
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto relative px-4 sm:px-6">
       
-      {/* Top Menu Button */}
-      <div className="absolute top-8 right-8 z-50">
+      {/* Top Menu Button - Fixed to Screen Corner */}
+      <div className="fixed top-6 right-6 z-[60]">
         <button 
           onClick={() => setIsMenuOpen(true)}
-          className="p-3 glass-button rounded-2xl text-slate-400 hover:text-emerald-400"
+          className="p-4 glass-button rounded-2xl text-slate-400 hover:text-emerald-400 transition-all hover:scale-110 shadow-2xl"
         >
           <Menu size={24} />
         </button>
@@ -128,15 +138,8 @@ export const PureChat: React.FC = () => {
         </div>
       )}
 
-      {/* Header Info */}
-      <div className="pt-12 pb-8 flex flex-col items-center gap-2">
-        <div className="flex items-center gap-2 text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em] opacity-80">
-          <Shield size={12} /> Standalone Control Plane
-        </div>
-        <h1 className="text-slate-600 font-medium text-sm flex items-center gap-2">
-          Intelligence Status: <span className="text-emerald-400 font-bold">READY</span>
-        </h1>
-      </div>
+      {/* Header Info - Removed as requested */}
+      <div className="pt-12" />
 
       {/* Chat Area */}
       <div 
@@ -189,9 +192,9 @@ export const PureChat: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 sm:px-6">
+      <div className="fixed bottom-[120px] left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 sm:px-6">
         <div className="relative group">
-          <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-3xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
+          {/* Removed focus glow inset-0 */}
           <div className="relative flex items-center glass-input rounded-[2.5rem] p-2 pr-4 shadow-2xl">
             <input 
               type="text"
@@ -199,7 +202,7 @@ export const PureChat: React.FC = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="輸入訊息，由 AGI 中心調度邏輯..."
-              className="flex-1 bg-transparent border-none text-slate-100 placeholder:text-slate-600 focus:ring-0 px-6 py-4 text-lg"
+              className="flex-1 bg-transparent border-none text-slate-100 placeholder:text-slate-600 focus:ring-0 outline-none px-6 py-4 text-lg"
             />
             <button 
               onClick={handleSend}
