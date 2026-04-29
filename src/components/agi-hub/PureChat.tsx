@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, User, Brain, Shield, Menu, X, ArrowRight, LayoutGrid, Globe, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Message {
   role: 'user' | 'agi';
@@ -12,6 +13,7 @@ interface Message {
 }
 
 export const PureChat: React.FC = () => {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'agi',
