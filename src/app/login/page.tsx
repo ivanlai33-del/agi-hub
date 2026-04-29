@@ -41,8 +41,8 @@ export default function LoginPage() {
     <div className="min-h-screen w-full flex flex-col items-center justify-center p-6">
       
       <motion.form
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         onSubmit={handleLogin}
         className="w-full max-w-[320px] space-y-6"
       >
@@ -54,7 +54,7 @@ export default function LoginPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="USERNAME"
-            className="w-full bg-slate-950/40 backdrop-blur-2xl border border-emerald-500/20 rounded-2xl px-6 py-4 text-white text-center tracking-[0.3em] placeholder:text-slate-800 placeholder:tracking-[0.3em] focus:outline-none focus:border-emerald-500/50 transition-all duration-500 animate-glow-pulse shadow-[0_0_15px_rgba(16,185,129,0.05)]"
+            className="w-full bg-transparent hover:bg-slate-950/40 focus:bg-slate-950/60 backdrop-blur-md border border-emerald-500/0 hover:border-emerald-500/20 focus:border-emerald-500/40 rounded-full px-8 py-5 text-white text-center tracking-[0.3em] placeholder:text-slate-900 focus:placeholder:text-slate-800 focus:outline-none transition-all duration-700 animate-glow-pulse shadow-none hover:shadow-[0_0_20px_rgba(16,185,129,0.05)]"
           />
         </div>
 
@@ -65,27 +65,27 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="PASSWORD"
-            className="w-full bg-slate-950/40 backdrop-blur-2xl border border-emerald-500/20 rounded-2xl px-6 py-4 text-white text-center tracking-[0.3em] placeholder:text-slate-800 placeholder:tracking-[0.3em] focus:outline-none focus:border-emerald-500/50 transition-all duration-500 animate-glow-pulse [animation-delay:1s] shadow-[0_0_15px_rgba(16,185,129,0.05)]"
+            className="w-full bg-transparent hover:bg-slate-950/40 focus:bg-slate-950/60 backdrop-blur-md border border-emerald-500/0 hover:border-emerald-500/20 focus:border-emerald-500/40 rounded-full px-8 py-5 text-white text-center tracking-[0.3em] placeholder:text-slate-900 focus:placeholder:text-slate-800 focus:outline-none transition-all duration-700 animate-glow-pulse [animation-delay:1s] shadow-none hover:shadow-[0_0_20px_rgba(16,185,129,0.05)]"
           />
         </div>
 
-        {/* Hidden Submit for Enter Key functionality */}
+        {/* Hidden Submit */}
         <button type="submit" className="hidden" />
         
         {isLoading && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center text-[10px] text-emerald-500/50 tracking-[0.5em] font-bold uppercase mt-4"
+            className="text-center text-[10px] text-emerald-500/50 tracking-[0.5em] font-bold uppercase mt-6"
           >
             Authenticating...
           </motion.div>
         )}
       </motion.form>
 
-      {/* Background Decorative Element (Optional minimal glow) */}
+      {/* Background Decorative Element */}
       <div className="fixed inset-0 z-[-1] flex items-center justify-center pointer-events-none">
-        <div className="w-[400px] h-[400px] bg-emerald-500/5 blur-[120px] rounded-full animate-pulse" />
+        <div className="w-[500px] h-[500px] bg-emerald-500/[0.03] blur-[150px] rounded-full animate-pulse" />
       </div>
     </div>
   );
