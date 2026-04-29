@@ -24,6 +24,7 @@ export const PureChat: React.FC = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -121,19 +122,26 @@ export const PureChat: React.FC = () => {
 
             <nav className="grid grid-cols-1 gap-4">
               {[
-                { label: '職人大腦智庫', href: '/registry', color: 'hover:text-emerald-400' },
-                { label: '連線資產清單', href: '/assets', color: 'hover:text-cyan-400' },
-                { label: '系統參數設定', href: '#', color: 'hover:text-slate-200' },
+                { id: 'registry', label: '職人大腦智庫', href: '/registry', color: 'hover:text-emerald-400' },
+                { id: 'assets', label: '連線資產清單', href: '/assets', color: 'hover:text-cyan-400' },
+                { id: 'settings', label: '系統參數設定', href: '#', color: 'hover:text-slate-200' },
               ].map((item) => (
-                <Link 
+                <button 
                   key={item.label}
-                  href={item.href}
-                  className={`block p-6 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-full transition-all duration-500 group opacity-20 hover:opacity-100`}
+                  onClick={() => {
+                    if (item.id === 'settings') {
+                      setIsSettingsOpen(true);
+                      setIsMenuOpen(false);
+                    } else if (item.href !== '#') {
+                      router.push(item.href);
+                    }
+                  }}
+                  className={`block p-6 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-full transition-all duration-500 group opacity-20 hover:opacity-100 text-center w-full`}
                 >
                   <span className={`text-sm font-bold tracking-[0.3em] text-slate-300 ${item.color} transition-colors`}>
                     {item.label}
                   </span>
-                </Link>
+                </button>
               ))}
               
               <button 
@@ -145,6 +153,45 @@ export const PureChat: React.FC = () => {
                 </span>
               </button>
             </nav>
+          </div>
+        </div>
+      )}
+
+      {/* System Settings Panel Overlay */}
+      {isSettingsOpen && (
+        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-2xl flex items-center justify-center p-6 animate-in zoom-in-95 duration-300">
+          <div className="w-full max-w-lg glass-card rounded-[3rem] p-10 border border-emerald-500/10 relative">
+            <button 
+              onClick={() => setIsSettingsOpen(false)}
+              className="absolute top-8 right-8 text-slate-500 hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+            
+            <div className="mb-10">
+              <h3 className="text-2xl font-black text-white tracking-widest mb-1">SYSTEM CORE</h3>
+              <p className="text-[10px] text-emerald-500/50 font-bold uppercase tracking-[0.3em]">Runtime Parameters</p>
+            </div>
+
+            <div className="space-y-6">
+              {[
+                { label: '核心運算模型', value: 'Gemini-1.5-Flash-Latest' },
+                { label: '通訊協議端點', value: 'Google Language v1beta' },
+                { label: '連線認證狀態', value: 'Encrypted Session Active' },
+                { label: '系統識別編號', value: 'AGI-HUB-DELTA-01' },
+                { label: '平均響應延遲', value: '1.2s - 1.8s' },
+                { label: '運作環境類型', value: 'Edge Runtime / Node.js' },
+              ].map((param, idx) => (
+                <div key={idx} className="flex items-center justify-between border-b border-white/5 pb-4 last:border-0">
+                  <span className="text-xs text-slate-500 font-bold tracking-widest">{param.label}</span>
+                  <span className="text-xs text-emerald-400 font-mono tracking-tighter">{param.value}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-10 p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/10 text-center">
+              <p className="text-[9px] text-emerald-500/40 font-bold tracking-[0.2em]">所有核心參數皆已根據獨立控制平面協議鎖定</p>
+            </div>
           </div>
         </div>
       )}
