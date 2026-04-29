@@ -73,7 +73,7 @@ export default function LoginPage() {
         <button 
           type="submit"
           disabled={isLoading || !username || !password}
-          className="w-full py-5 bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-emerald-500/30 rounded-full text-white font-bold tracking-[0.5em] text-[11px] transition-all duration-500 disabled:opacity-0 active:scale-95"
+          className="w-full py-5 bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-emerald-500/30 rounded-full text-white font-bold tracking-[0.5em] text-[11px] transition-all duration-500 disabled:opacity-0 active:scale-95 opacity-20 hover:opacity-100"
         >
           {isLoading ? 'VERIFYING...' : 'UNLOCK HUB'}
         </button>

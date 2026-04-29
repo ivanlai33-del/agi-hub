@@ -128,7 +128,7 @@ export const PureChat: React.FC = () => {
                 <Link 
                   key={item.label}
                   href={item.href}
-                  className={`block p-6 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-full transition-all duration-500 group`}
+                  className={`block p-6 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-full transition-all duration-500 group opacity-20 hover:opacity-100`}
                 >
                   <span className={`text-sm font-bold tracking-[0.3em] text-slate-300 ${item.color} transition-colors`}>
                     {item.label}
@@ -138,7 +138,7 @@ export const PureChat: React.FC = () => {
               
               <button 
                 onClick={handleLogout}
-                className="block p-6 bg-red-500/5 hover:bg-red-500/10 backdrop-blur-xl border border-red-500/10 hover:border-red-500/30 rounded-full transition-all duration-500 group"
+                className="block p-6 bg-red-500/5 hover:bg-red-500/10 backdrop-blur-xl border border-red-500/10 hover:border-red-500/30 rounded-full transition-all duration-500 group opacity-20 hover:opacity-100"
               >
                 <span className="text-sm font-bold tracking-[0.3em] text-red-500/60 group-hover:text-red-500 transition-colors">
                   登出系統
@@ -217,7 +217,7 @@ export const PureChat: React.FC = () => {
             <button 
               onClick={handleSend}
               disabled={isLoading || !input.trim()}
-              className="bg-emerald-500/10 hover:bg-emerald-500/20 backdrop-blur-md text-emerald-400 p-4 rounded-full transition-all disabled:opacity-0 hover:scale-105 active:scale-95 group border border-emerald-500/20"
+              className="bg-emerald-500/10 hover:bg-emerald-500/20 backdrop-blur-md text-emerald-400 p-4 rounded-full transition-all disabled:opacity-0 hover:scale-105 active:scale-95 group border border-emerald-500/20 opacity-20 hover:opacity-100"
             >
               <span className="text-[10px] font-black tracking-widest px-2">SEND</span>
             </button>

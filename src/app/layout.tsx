@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
-      <body className={`${inter.className} bg-slate-950 text-slate-200 antialiased relative`}>
+      <body className={`${inter.className} bg-black text-slate-200 antialiased relative`}>
         <BackgroundSlideshow />
         <div className="relative z-10">
           {children}
