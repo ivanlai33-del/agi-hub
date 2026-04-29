@@ -82,6 +82,12 @@ export const PureChat: React.FC = () => {
     }
   };
 
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+    router.refresh();
+  };
+
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto relative px-4 sm:px-6">
       
@@ -118,7 +124,6 @@ export const PureChat: React.FC = () => {
               {[
                 { label: '職人大腦智庫', href: '/registry', icon: Brain, color: 'text-emerald-400' },
                 { label: '連線資產清單', href: '/assets', icon: Globe, color: 'text-cyan-400' },
-                { label: '積木工坊', href: '#', icon: LayoutGrid, color: 'text-slate-300' },
                 { label: '系統參數設定', href: '#', icon: Settings, color: 'text-slate-500' },
               ].map((item) => (
                 <Link 
@@ -133,6 +138,17 @@ export const PureChat: React.FC = () => {
                   <ArrowRight size={18} className="text-slate-600 group-hover:text-white transition-colors" />
                 </Link>
               ))}
+              
+              <button 
+                onClick={handleLogout}
+                className="flex items-center gap-4 p-5 glass-button rounded-3xl group border-red-500/10 hover:border-red-500/30"
+              >
+                <div className="p-3 rounded-2xl bg-slate-950 text-red-400">
+                  <LogOut size={20} />
+                </div>
+                <span className="flex-1 text-left font-bold text-red-400/80 group-hover:text-red-400">登出系統</span>
+                <ArrowRight size={18} className="text-slate-600 group-hover:text-red-400 transition-colors" />
+              </button>
             </nav>
           </div>
         </div>
