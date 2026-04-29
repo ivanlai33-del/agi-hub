@@ -38,13 +38,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative">
       
       <motion.form
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         onSubmit={handleLogin}
-        className="w-full max-w-[320px] space-y-6"
+        className="w-full max-w-[320px] space-y-6 relative z-20"
       >
         {/* Username Field */}
         <div className="relative group">
@@ -54,7 +54,7 @@ export default function LoginPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="USERNAME"
-            className="w-full bg-transparent hover:bg-slate-950/40 focus:bg-slate-950/60 backdrop-blur-md border border-emerald-500/0 hover:border-emerald-500/20 focus:border-emerald-500/40 rounded-full px-8 py-5 text-white text-center tracking-[0.3em] placeholder:text-slate-900 focus:placeholder:text-slate-800 focus:outline-none transition-all duration-700 animate-glow-pulse shadow-none hover:shadow-[0_0_20px_rgba(16,185,129,0.05)]"
+            className="w-full bg-slate-950/20 hover:bg-slate-950/40 focus:bg-slate-950/60 backdrop-blur-md border border-emerald-500/10 hover:border-emerald-500/30 focus:border-emerald-500/50 rounded-full px-8 py-5 text-white text-center tracking-[0.3em] placeholder:text-slate-900 focus:placeholder:text-slate-800 focus:outline-none transition-all duration-700 animate-glow-pulse shadow-none"
           />
         </div>
 
@@ -65,27 +65,24 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="PASSWORD"
-            className="w-full bg-transparent hover:bg-slate-950/40 focus:bg-slate-950/60 backdrop-blur-md border border-emerald-500/0 hover:border-emerald-500/20 focus:border-emerald-500/40 rounded-full px-8 py-5 text-white text-center tracking-[0.3em] placeholder:text-slate-900 focus:placeholder:text-slate-800 focus:outline-none transition-all duration-700 animate-glow-pulse [animation-delay:1s] shadow-none hover:shadow-[0_0_20px_rgba(16,185,129,0.05)]"
+            className="w-full bg-slate-950/20 hover:bg-slate-950/40 focus:bg-slate-950/60 backdrop-blur-md border border-emerald-500/10 hover:border-emerald-500/30 focus:border-emerald-500/50 rounded-full px-8 py-5 text-white text-center tracking-[0.3em] placeholder:text-slate-900 focus:placeholder:text-slate-800 focus:outline-none transition-all duration-700 animate-glow-pulse [animation-delay:1s] shadow-none"
           />
         </div>
 
-        {/* Hidden Submit */}
-        <button type="submit" className="hidden" />
-        
-        {isLoading && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center text-[10px] text-emerald-500/50 tracking-[0.5em] font-bold uppercase mt-6"
-          >
-            Authenticating...
-          </motion.div>
-        )}
+        {/* Glass Unlock Button */}
+        <button 
+          type="submit"
+          disabled={isLoading || !username || !password}
+          className="w-full py-5 bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/10 hover:border-emerald-500/30 rounded-full text-white font-bold tracking-[0.5em] text-[11px] transition-all duration-500 disabled:opacity-0 active:scale-95"
+        >
+          {isLoading ? 'VERIFYING...' : 'UNLOCK HUB'}
+        </button>
       </motion.form>
 
-      {/* Background Decorative Element */}
-      <div className="fixed inset-0 z-[-1] flex items-center justify-center pointer-events-none">
-        <div className="w-[500px] h-[500px] bg-emerald-500/[0.03] blur-[150px] rounded-full animate-pulse" />
+      {/* Atmospheric elements to match the main page */}
+      <div className="fixed inset-0 z-10 pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-emerald-500/[0.03] blur-[140px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-500/[0.03] blur-[120px] rounded-full animate-pulse [animation-delay:3s]" />
       </div>
     </div>
   );

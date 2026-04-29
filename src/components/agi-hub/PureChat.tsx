@@ -212,22 +212,21 @@ export const PureChat: React.FC = () => {
       {/* Input Area */}
       <div className="fixed bottom-[120px] left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 sm:px-6">
         <div className="relative group">
-          {/* Removed focus glow inset-0 */}
-          <div className="relative flex items-center glass-input rounded-[2.5rem] p-2 pr-4 shadow-2xl">
+          <div className="relative flex items-center glass-input rounded-full p-2 pr-4 shadow-2xl">
             <input 
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
               placeholder="輸入訊息，由 AGI 中心調度邏輯..."
-              className="flex-1 bg-transparent border-none text-slate-100 placeholder:text-slate-600 focus:ring-0 outline-none px-6 py-4 text-lg"
+              className="flex-1 bg-transparent border-none text-slate-200 placeholder-slate-500 focus:ring-0 outline-none px-6 py-4 text-sm"
             />
             <button 
               onClick={handleSend}
-              disabled={!input.trim() || isLoading}
-              className="w-14 h-14 rounded-full bg-emerald-600/80 hover:bg-emerald-500 backdrop-blur-md disabled:opacity-30 text-white flex items-center justify-center shadow-lg shadow-emerald-900/20 transition-all active:scale-90"
+              disabled={isLoading || !input.trim()}
+              className="bg-emerald-500/10 hover:bg-emerald-500/20 backdrop-blur-md text-emerald-400 p-4 rounded-full transition-all disabled:opacity-0 hover:scale-105 active:scale-95 group border border-emerald-500/20"
             >
-              <Send size={24} />
+              <span className="text-[10px] font-black tracking-widest px-2">SEND</span>
             </button>
           </div>
         </div>
