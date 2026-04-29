@@ -25,6 +25,13 @@ export const BackgroundSlideshow: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      {/* Preload all images for instant switching on mobile/tablet */}
+      <div className="hidden">
+        {backgrounds.map((src) => (
+          <img key={src} src={src} alt="preload" />
+        ))}
+      </div>
+
       <AnimatePresence>
         <motion.div
           key={backgrounds[bgIndex]}
@@ -35,7 +42,7 @@ export const BackgroundSlideshow: React.FC = () => {
             opacity: { duration: 3 },
             scale: { duration: 12, ease: "linear" } 
           }}
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat will-change-[transform,opacity]"
           style={{ backgroundImage: `url(${backgrounds[bgIndex]})` }}
         />
       </AnimatePresence>
@@ -43,9 +50,9 @@ export const BackgroundSlideshow: React.FC = () => {
       {/* Dark Overlay for Legibility */}
       <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/40 to-slate-950/90 z-[1]" />
       
-      {/* Atmosphere Glows */}
-      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-emerald-500/10 blur-[140px] rounded-full animate-pulse z-[2]" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full animate-pulse [animation-delay:3s] z-[2]" />
+      {/* Atmosphere Glows - Using hardware acceleration */}
+      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-emerald-500/10 blur-[140px] rounded-full animate-pulse z-[2] will-change-opacity" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full animate-pulse [animation-delay:3s] z-[2] will-change-opacity" />
     </div>
   );
 };
