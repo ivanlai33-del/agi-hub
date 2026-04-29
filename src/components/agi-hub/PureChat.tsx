@@ -105,7 +105,7 @@ export const PureChat: React.FC = () => {
 
       {/* Immersive Menu Overlay */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-2xl animate-in fade-in duration-300 flex items-center justify-center p-8">
+        <div className="fixed inset-0 z-[100] bg-slate-950/40 backdrop-blur-3xl animate-in fade-in duration-500 flex items-center justify-center p-8">
           <button 
             onClick={() => setIsMenuOpen(false)}
             className="absolute top-8 right-8 p-3 text-slate-500 hover:text-white transition-colors"
@@ -113,43 +113,36 @@ export const PureChat: React.FC = () => {
             <X size={32} />
           </button>
           
-          <div className="max-w-md w-full space-y-8 text-center">
+          <div className="max-w-md w-full space-y-12 text-center">
             <div className="space-y-2">
-              <div className="w-20 h-20 bg-emerald-600 rounded-[2rem] mx-auto flex items-center justify-center text-white shadow-2xl shadow-emerald-900/40 mb-6">
-                <Brain size={40} />
-              </div>
-              <h2 className="text-3xl font-black text-white">AGI Hub Control</h2>
-              <p className="text-slate-500 font-medium">切換至獨立管理模組</p>
+              <h2 className="text-4xl font-black text-white tracking-widest">AGI HUB</h2>
+              <p className="text-emerald-500/60 font-bold uppercase tracking-[0.4em] text-[10px]">Management Modules</p>
             </div>
 
-            <nav className="grid grid-cols-1 gap-3">
+            <nav className="grid grid-cols-1 gap-4">
               {[
-                { label: '職人大腦智庫', href: '/registry', icon: Brain, color: 'text-emerald-400' },
-                { label: '連線資產清單', href: '/assets', icon: Globe, color: 'text-cyan-400' },
-                { label: '系統參數設定', href: '#', icon: Settings, color: 'text-slate-500' },
+                { label: '職人大腦智庫', href: '/registry', color: 'hover:text-emerald-400' },
+                { label: '連線資產清單', href: '/assets', color: 'hover:text-cyan-400' },
+                { label: '系統參數設定', href: '#', color: 'hover:text-slate-200' },
               ].map((item) => (
                 <Link 
                   key={item.label}
                   href={item.href}
-                  className="flex items-center gap-4 p-5 glass-button rounded-3xl group"
+                  className={`block p-6 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-full transition-all duration-500 group`}
                 >
-                  <div className={`p-3 rounded-2xl bg-slate-950 ${item.color}`}>
-                    <item.icon size={20} />
-                  </div>
-                  <span className="flex-1 text-left font-bold text-slate-200">{item.label}</span>
-                  <ArrowRight size={18} className="text-slate-600 group-hover:text-white transition-colors" />
+                  <span className={`text-sm font-bold tracking-[0.3em] text-slate-300 ${item.color} transition-colors`}>
+                    {item.label}
+                  </span>
                 </Link>
               ))}
               
               <button 
                 onClick={handleLogout}
-                className="flex items-center gap-4 p-5 glass-button rounded-3xl group border-red-500/10 hover:border-red-500/30"
+                className="block p-6 bg-red-500/5 hover:bg-red-500/10 backdrop-blur-xl border border-red-500/10 hover:border-red-500/30 rounded-full transition-all duration-500 group"
               >
-                <div className="p-3 rounded-2xl bg-slate-950 text-red-400">
-                  <LogOut size={20} />
-                </div>
-                <span className="flex-1 text-left font-bold text-red-400/80 group-hover:text-red-400">登出系統</span>
-                <ArrowRight size={18} className="text-slate-600 group-hover:text-red-400 transition-colors" />
+                <span className="text-sm font-bold tracking-[0.3em] text-red-500/60 group-hover:text-red-500 transition-colors">
+                  登出系統
+                </span>
               </button>
             </nav>
           </div>
