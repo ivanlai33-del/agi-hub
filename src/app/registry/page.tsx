@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Brain, ArrowLeft, Plus, Settings, Shield, Zap, ChevronRight, Save, Globe } from 'lucide-react';
+import { Brain, ArrowLeft, Plus, Settings, Shield, Zap, ChevronRight, Save, Globe, Users, Trash2, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -18,6 +18,11 @@ export default function RegistryPage() {
   const [brains, setBrains] = useState<BrainConfig[]>([]);
   const [selectedBrain, setSelectedBrain] = useState<BrainConfig | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [showUserMgmt, setShowUserMgmt] = useState(false);
+  const [users, setUsers] = useState<{userId: string, role: string}[]>([]);
+  const [currentUser, setCurrentUser] = useState<{userId: string, role: string} | null>(null);
+  const [newUser, setNewUser] = useState({ userId: '', password: '', role: 'user' });
 
   useEffect(() => {
     fetch('/api/v1/brains')
@@ -26,7 +31,45 @@ export default function RegistryPage() {
         setBrains(data);
         if (data.length > 0) setSelectedBrain(data[0]);
       });
+
+    // Get current user info from session cookie (client side decoding for UI hints)
+    const cookies = document.cookie.split('; ');
+    const session = cookies.find(row => row.startsWith('agi_hub_session='))?.split('=')[1];
+    if (session) {
+      try {
+        const decoded = atob(session);
+        const [userId, role] = decoded.split(':');
+        setCurrentUser({ userId, role });
+        if (role === 'admin') {
+          fetch('/api/auth/users').then(res => res.json()).then(setUsers);
+        }
+      } catch (e) {}
+    }
   }, []);
+
+  const handleAddUser = async () => {
+    if (!newUser.userId || !newUser.password) return;
+    await fetch('/api/auth/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newUser),
+    });
+    const updated = await fetch('/api/auth/users').then(res => res.json());
+    setUsers(updated);
+    setNewUser({ userId: '', password: '', role: 'user' });
+    import('sonner').then(({ toast }) => toast.success('帳號已更新'));
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    await fetch('/api/auth/users', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    });
+    const updated = await fetch('/api/auth/users').then(res => res.json());
+    setUsers(updated);
+    import('sonner').then(({ toast }) => toast.info('帳號已移除'));
+  };
 
   const handleSave = async () => {
     if (!selectedBrain) return;
@@ -64,71 +107,169 @@ export default function RegistryPage() {
     <div className="min-h-screen bg-transparent text-white p-8 sm:p-12 relative z-10">
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-16 flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <Link href="/" className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-all border border-white/5">
-            <ArrowLeft size={20} />
-          </Link>
-          <div>
-            <h1 className="text-3xl font-black tracking-tighter">Brain Registry</h1>
-            <p className="text-slate-500 text-sm font-bold uppercase tracking-widest mt-1">職人大腦智庫與模組配置</p>
+        <div className="flex items-center justify-between mb-16 w-full">
+          <div className="space-y-2">
+            <h1 className="text-5xl font-black tracking-tighter text-white">智庫管理中心</h1>
+            <p className="text-emerald-500/60 font-bold uppercase tracking-[0.4em] text-xs">AGI Registry Management</p>
+          </div>
+          <div className="flex items-center gap-4">
+            {currentUser?.role === 'admin' && (
+              <button 
+                onClick={() => setShowUserMgmt(!showUserMgmt)}
+                className={`px-6 py-3 rounded-2xl text-[10px] font-black tracking-widest transition-all border flex items-center gap-2 ${
+                  showUserMgmt ? 'bg-cyan-500 text-white border-cyan-400' : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'
+                }`}
+              >
+                <Users size={16} />
+                帳號管理
+              </button>
+            )}
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[10px] font-black tracking-widest transition-all border border-white/10 flex items-center gap-2"
+            >
+              <ChevronLeft size={16} />
+              返回導航首頁
+            </button>
           </div>
         </div>
-        <button 
-          onClick={handleCreateBrain}
-          className="px-6 py-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded-full text-xs font-black tracking-widest border border-emerald-500/20 transition-all flex items-center gap-2"
-        >
-          <Plus size={14} /> 培訓新大腦
-        </button>
+
+        {showUserMgmt && currentUser?.role === 'admin' && (
+          <div className="mb-12 glass-card rounded-[2.5rem] border border-cyan-500/20 p-8 animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="flex items-center gap-3 mb-6">
+              <Users size={20} className="text-cyan-400" />
+              <h3 className="text-xl font-bold text-white">子帳號權限管理</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+              <input 
+                type="text" 
+                placeholder="帳號 ID" 
+                value={newUser.userId}
+                onChange={e => setNewUser({...newUser, userId: e.target.value})}
+                className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"
+              />
+              <input 
+                type="password" 
+                placeholder="設定密碼" 
+                value={newUser.password}
+                onChange={e => setNewUser({...newUser, password: e.target.value})}
+                className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"
+              />
+              <select 
+                value={newUser.role}
+                onChange={e => setNewUser({...newUser, role: e.target.value})}
+                className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 appearance-none"
+              >
+                <option value="user">普通使用者 (僅限聊天)</option>
+                <option value="admin">管理員 (全權限)</option>
+              </select>
+              <button 
+                onClick={handleAddUser}
+                className="bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-bold text-xs tracking-widest transition-all"
+              >
+                新增 / 更新帳號
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {users.map(u => (
+                <div key={u.userId} className="flex items-center justify-between p-4 bg-white/[0.03] border border-white/5 rounded-2xl">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-slate-200">{u.userId}</span>
+                    <span className="text-[9px] uppercase tracking-widest text-cyan-500/60 font-black">{u.role}</span>
+                  </div>
+                  {u.userId !== 'ivan' && (
+                    <button 
+                      onClick={() => handleDeleteUser(u.userId)}
+                      className="p-2 text-slate-500 hover:text-red-400 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Fixed-height Grid for Independent Scrolling */}
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 h-[calc(100vh-240px)]">
         {/* Left: Brain List (Independent Scroll) */}
-        <div className="lg:col-span-4 overflow-y-auto pr-4 scrollbar-hide">
-          <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4 ml-2">Available Brains</div>
-          <div className="space-y-4 pb-10">
-            {brains.map(brain => (
-            <button
+        <div className="lg:col-span-4 flex flex-col h-full overflow-hidden">
+          <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-3 ml-2">可用大腦母版庫</div>
+          
+          {/* Category Filter */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-3 mb-2 flex-shrink-0">
+            {['All', ...Array.from(new Set(brains.map(b => b.category)))].map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest transition-all ${
+                  activeCategory === cat 
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                  : 'bg-white/5 text-slate-500 hover:text-slate-300 border border-transparent'
+                }`}
+              >
+                {cat === 'All' ? '全部領域' : cat}
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-3 overflow-y-auto pb-10 scrollbar-hide flex-1 pr-2">
+            {(activeCategory === 'All' ? brains : brains.filter(b => b.category === activeCategory)).map(brain => {
+              const isMaster = brain.id.startsWith('agency_');
+              return (
+            <div
               key={brain.id}
               onClick={() => {
                 setSelectedBrain(brain);
                 setIsEditing(false);
               }}
-              className={`w-full text-left p-6 rounded-[2.5rem] border transition-all duration-500 group relative overflow-hidden ${
+              className={`cursor-pointer w-full text-left p-4 rounded-[1.5rem] border transition-all duration-300 group relative overflow-hidden ${
                 selectedBrain?.id === brain.id 
                 ? 'bg-emerald-600/10 border-emerald-500/30 ring-1 ring-emerald-500/20' 
                 : 'bg-white/[0.02] border-white/5 hover:bg-white/[0.05]'
               }`}
             >
-              <div className="flex items-center gap-4 mb-3">
-                <div className={`p-3 rounded-2xl ${selectedBrain?.id === brain.id ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400 group-hover:text-white transition-colors'}`}>
-                  <Brain size={20} />
+              <div className="flex items-center gap-3 mb-2">
+                <div className={`p-2 rounded-xl ${selectedBrain?.id === brain.id ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400 group-hover:text-white transition-colors'}`}>
+                  <Brain size={16} />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{brain.category}</span>
+                <div className="flex items-center gap-2 flex-1">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 truncate">{brain.category}</span>
+                  {isMaster && (
+                    <span className="px-1.5 py-0.5 bg-slate-800/80 text-emerald-500/80 rounded text-[8px] font-bold tracking-widest border border-emerald-500/20 whitespace-nowrap">
+                      母版
+                    </span>
+                  )}
+                </div>
               </div>
-              <h3 className="text-lg font-bold text-slate-200 mb-1">{brain.name}</h3>
-              <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{brain.description}</p>
+              <h3 className="text-sm font-bold text-slate-200 mb-1">{brain.name}</h3>
+              <p className="text-[11px] text-slate-500 line-clamp-1 leading-relaxed">{brain.description}</p>
               
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mt-3">
                   <button 
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       localStorage.setItem('active_brain', JSON.stringify(brain));
                       toast.success(`已調度 ${brain.name}`);
                       setTimeout(() => window.location.href = '/', 500);
                     }}
-                    className="p-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 rounded-xl transition-all border border-emerald-500/20"
+                    className="p-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 rounded-lg transition-all border border-emerald-500/20"
                     title="立即調度"
                   >
-                    <Zap size={16} />
+                    <Zap size={14} />
                   </button>
                   {selectedBrain?.id === brain.id && (
-                    <div className="text-emerald-500">
-                      <ChevronRight size={24} />
+                    <div className="text-emerald-500 ml-auto">
+                      <ChevronRight size={18} />
                     </div>
                   )}
                 </div>
-            </button>
-            ))}
+            </div>
+            )})}
           </div>
         </div>
 
@@ -138,8 +279,15 @@ export default function RegistryPage() {
             <div className="glass-card rounded-[3.5rem] border border-white/5 p-12 space-y-10 animate-in fade-in slide-in-from-right-8 duration-700 bg-white/[0.01]">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-3xl font-black tracking-tight text-white">{selectedBrain.name}</h2>
-                  <p className="text-emerald-500/60 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Processing Configuration v1.0</p>
+                  <div className="flex items-center gap-3 mb-1">
+                    <h2 className="text-3xl font-black tracking-tight text-white">{selectedBrain.name}</h2>
+                    {selectedBrain.id.startsWith('agency_') && (
+                      <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-md text-[10px] font-bold tracking-widest">
+                        官方母版
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-emerald-500/60 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">母版配置 V1.0</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <button 
@@ -154,13 +302,28 @@ export default function RegistryPage() {
                     立即調度此職人
                   </button>
                   <button 
-                    onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                    onClick={() => {
+                      if (isEditing) {
+                        handleSave();
+                      } else {
+                        if (selectedBrain.id.startsWith('agency_')) {
+                          // Clone logic
+                          const newBrain = { ...selectedBrain, id: `custom_${Date.now()}`, name: `${selectedBrain.name} (客製版)` };
+                          setBrains([newBrain, ...brains]);
+                          setSelectedBrain(newBrain);
+                          setIsEditing(true);
+                          toast.success('已複製母版，您可以開始客製化了');
+                        } else {
+                          setIsEditing(true);
+                        }
+                      }
+                    }}
                     className={`px-8 py-4 rounded-2xl text-[10px] font-black tracking-widest transition-all flex items-center gap-2 border ${
                       isEditing ? 'bg-emerald-500 text-white border-emerald-400 shadow-lg' : 'bg-white/5 text-slate-400 hover:text-white border-white/10'
                     }`}
                   >
-                    {isEditing ? <Save size={16} /> : <Settings size={16} />}
-                    {isEditing ? '儲存配置' : '修改模組'}
+                    {isEditing ? <Save size={16} /> : (selectedBrain.id.startsWith('agency_') ? <Plus size={16} /> : <Settings size={16} />)}
+                    {isEditing ? '儲存配置' : (selectedBrain.id.startsWith('agency_') ? '複製為客製版本' : '修改模組')}
                   </button>
                 </div>
               </div>
@@ -211,7 +374,7 @@ export default function RegistryPage() {
                     <div key={i} className="flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-[2rem] group hover:border-emerald-500/20 transition-all">
                       <div className="flex flex-col gap-1">
                         <span className="text-sm font-black text-slate-300 group-hover:text-white transition-colors">{mod}</span>
-                        <span className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">Active Component</span>
+                        <span className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">啟用積木</span>
                       </div>
                       <div className="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_12px_rgba(16,185,129,0.8)]" />
                     </div>

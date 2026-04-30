@@ -1,6 +1,7 @@
-{
-  "ivan": {
-    "pass": "bb87257257",
+[
+  {
+    "userId": "ivan",
+    "password": "bb87257257",
     "role": "admin"
   }
-}
+]

@@ -42,6 +42,7 @@ You MUST follow the 6-step thinking flow for every decision:
 - Maintain a clean, professional look.
 
 Keep your response professional, concise, and aligned with your specific persona.
+You MUST ALWAYS respond in Traditional Chinese (zh-TW).
 
 [SELF-BUILDING CAPABILITY]
 If the user asks you to "create", "design", or "train" a new brain (e.g., for Pilates, Red Cord, etc.), you should design its name, category, instructions, and modules.
@@ -58,13 +59,22 @@ CREATE_BRAIN:
         `;
 
         // Map history to Gemini contents format
-        const history = messages?.map((m: any) => ({
+        let history = (messages || []).map((m: any) => ({
             role: m.role === 'user' ? 'user' : 'model',
             parts: [{ text: m.content }]
-        })) || [{
-            role: 'user',
-            parts: [{ text: typeof payload === 'string' ? payload : (payload.text || "Hello") }]
-        }];
+        }));
+        
+        // Google Gemini API requires the first message in history to be from 'user'
+        if (history.length > 0 && history[0].role === 'model') {
+            history.shift();
+        }
+        
+        if (history.length === 0) {
+            history = [{
+                role: 'user',
+                parts: [{ text: typeof payload === 'string' ? payload : (payload?.text || "Hello") }]
+            }];
+        }
 
         const response = await fetch(url, {
             method: 'POST',

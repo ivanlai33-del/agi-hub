@@ -15,12 +15,26 @@ const backgrounds = [
 
 export const BackgroundSlideshow: React.FC = () => {
   const [bgIndex, setBgIndex] = useState(0);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const timer = setInterval(() => {
       setBgIndex((prev) => (prev + 1) % backgrounds.length);
-    }, 10000); // 10 seconds
-    return () => clearInterval(timer);
+    }, 25000); // 25 seconds
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      // Calculate normalized mouse position (-0.5 to 0.5)
+      setMousePos({
+        x: (e.clientX / window.innerWidth) - 0.5,
+        y: (e.clientY / window.innerHeight) - 0.5,
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
   return (
@@ -36,11 +50,18 @@ export const BackgroundSlideshow: React.FC = () => {
         <motion.div
           key={backgrounds[bgIndex]}
           initial={{ opacity: 0, scale: 1 }}
-          animate={{ opacity: 0.5, scale: 1.15 }}
+          animate={{ 
+            opacity: 0.5, 
+            scale: 1.2,
+            x: mousePos.x * 30, // 30px max horizontal movement
+            y: mousePos.y * 30, // 30px max vertical movement
+          }}
           exit={{ opacity: 0 }}
           transition={{ 
-            opacity: { duration: 3 },
-            scale: { duration: 12, ease: "linear" } 
+            opacity: { duration: 4 },
+            scale: { duration: 25, ease: "linear" },
+            x: { type: "spring", stiffness: 20, damping: 30 },
+            y: { type: "spring", stiffness: 20, damping: 30 }
           }}
           className="absolute inset-0 bg-cover bg-center bg-no-repeat will-change-[transform,opacity]"
           style={{ backgroundImage: `url(${backgrounds[bgIndex]})` }}

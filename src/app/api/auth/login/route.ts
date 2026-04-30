@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import fs from 'fs';
+import path from 'path';
 
 // 記憶體內的嘗試紀錄 (開發環境可用，生產環境建議使用 Redis)
 // 記錄格式: { ip: { attempts: number, lastAttempt: number, lockedUntil: number } }
@@ -25,16 +27,19 @@ export async function POST(req: Request) {
       }, { status: 429 });
     }
 
-    // 從環境變數讀取正確密碼
-    const envUserKey = `AUTH_USER_${userId.toUpperCase()}`;
-    const correctPassword = process.env[envUserKey];
+    // 從 JSON 讀取使用者
+    const usersPath = path.join(process.cwd(), 'src/data/users.json');
+    const users = JSON.parse(fs.readFileSync(usersPath, 'utf8'));
+    const user = users.find((u: any) => u.userId.toLowerCase() === userId.toLowerCase());
 
     // 2. 驗證
-    if (correctPassword && correctPassword === password) {
+    if (user && user.password === password) {
       // 登入成功，重置紀錄
       loginAttempts.delete(ip);
 
-      cookies().set('agi_hub_session', 'true', {
+      const sessionData = Buffer.from(`${user.userId}:${user.role}`).toString('base64');
+
+      cookies().set('agi_hub_session', sessionData, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -42,7 +47,7 @@ export async function POST(req: Request) {
         path: '/',
       });
 
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ success: true, role: user.role });
     }
 
     // 3. 驗證失敗處理
