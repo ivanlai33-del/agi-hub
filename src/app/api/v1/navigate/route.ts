@@ -104,3 +104,14 @@ CREATE_BRAIN:
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
+
+// 診斷工具：檢查環境變數是否正確載入
+export async function GET() {
+    return NextResponse.json({
+        has_key: !!process.env.AGI_HUB_GEMINI_KEY,
+        key_length: process.env.AGI_HUB_GEMINI_KEY?.length || 0,
+        env_keys: Object.keys(process.env).filter(k => k.startsWith('AGI_')),
+        node_env: process.env.NODE_ENV,
+        runtime: 'nodejs'
+    });
+}
