@@ -8,6 +8,18 @@ import {
 import Link from 'next/link';
 
 export default function AssetsPage() {
+  const [currentUser, setCurrentUser] = React.useState<{userId: string, role: string} | null>(null);
+
+  React.useEffect(() => {
+    fetch('/api/auth/session')
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated) {
+          setCurrentUser({ userId: data.userId, role: data.role });
+        }
+      });
+  }, []);
+
   const assets = [
     {
       id: 'site_estimator_pro',
@@ -30,6 +42,21 @@ export default function AssetsPage() {
       lastSeen: '15秒前'
     }
   ];
+
+  if (currentUser && currentUser.role !== 'admin') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-6">
+        <Shield size={64} className="text-amber-500 opacity-50" />
+        <h2 className="text-3xl font-black text-white">無權限存取資產清單</h2>
+        <p className="text-slate-400 max-w-md">
+          您的帳號權限僅限於與首頁 AGI 進行對話。資產清單與接入功能僅對管理員開放。
+        </p>
+        <Link href="/" className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-bold transition-all">
+          返回導航首頁
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-transparent p-8 space-y-12 max-w-7xl mx-auto">

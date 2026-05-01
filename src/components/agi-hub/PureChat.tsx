@@ -29,6 +29,7 @@ export const PureChat: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showResetX, setShowResetX] = useState(false);
   const [isBrainListOpen, setIsBrainListOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +40,9 @@ export const PureChat: React.FC = () => {
       try {
         const brain = JSON.parse(storedBrain);
         setActiveBrain(brain);
+        // Set admin status based on stored brain role if available
+        if (brain.role === 'admin') setIsAdmin(true);
+        
         setMessages([
           {
             role: 'agi',
@@ -50,6 +54,16 @@ export const PureChat: React.FC = () => {
         console.error('Failed to parse active brain');
       }
     }
+
+    // Check session for global admin status
+    fetch('/api/auth/session')
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated && data.role === 'admin') {
+          setIsAdmin(true);
+        }
+      })
+      .catch(() => {});
 
     // Also fetch all available brains for the quick-switcher
     fetch('/api/v1/brains')
@@ -226,20 +240,19 @@ export const PureChat: React.FC = () => {
 
             <nav className="grid grid-cols-1 gap-4">
               {[
-                { id: 'registry', label: '職人大腦智庫', href: '/registry', color: 'hover:text-emerald-400' },
-                { id: 'assets', label: '連線資產清單', href: '/assets', color: 'hover:text-cyan-400' },
-              ].map((item) => (
-                <button 
+                { id: 'registry', label: '職人大腦智庫', href: '/registry', color: 'hover:text-emerald-400', adminOnly: true },
+                { id: 'assets', label: '連線資產清單', href: '/assets', color: 'hover:text-cyan-400', adminOnly: true },
+                { id: 'users', label: '人員帳號管理', href: '/users', color: 'hover:text-amber-400', adminOnly: true },
+              ].filter(item => !item.adminOnly || isAdmin).map((item) => (
+                <Link 
                   key={item.label}
-                  onClick={() => {
-                    router.push(item.href);
-                  }}
-                  className={`block p-6 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-full transition-all duration-500 group opacity-20 hover:opacity-100 text-center w-full`}
+                  href={item.href}
+                  className={`block p-6 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl border border-white/5 hover:border-white/20 rounded-full transition-all duration-500 group opacity-20 hover:opacity-100 text-center w-full cursor-pointer`}
                 >
                   <span className={`text-sm font-bold tracking-[0.3em] text-slate-300 ${item.color} transition-colors`}>
                     {item.label}
                   </span>
-                </button>
+                </Link>
               ))}
               
               <button 
@@ -317,30 +330,30 @@ export const PureChat: React.FC = () => {
         className="flex-1 overflow-y-auto space-y-4 pb-48 pt-4 scrollbar-hide"
       >
         {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+          <div key={i} className={`flex gap-4 animate-in fade-in slide-in-from-bottom-6 duration-700 ease-out ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
             {/* Avatar Column */}
             <div className="flex flex-col items-center flex-shrink-0 mt-1">
-              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg transition-transform hover:scale-110 ${
-                msg.role === 'user' ? 'bg-slate-800 text-slate-400' : 'bg-emerald-600 text-white'
+              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 hover:scale-110 hover:-translate-y-1 ${
+                msg.role === 'user' ? 'bg-slate-800 text-slate-400 hover:shadow-slate-700/50' : 'bg-emerald-600 text-white hover:shadow-emerald-500/50'
               }`}>
                 {msg.role === 'user' ? <User size={20} /> : <Brain size={20} />}
               </div>
-              <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-2">
+              <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-2 transition-all duration-500 opacity-70">
                 {msg.role === 'user' ? 'You' : 'Brain'}
               </span>
             </div>
 
             {/* Content Column */}
-            <div className={`max-w-[80%] px-8 py-5 rounded-[2.5rem] text-base leading-relaxed shadow-2xl transition-all hover:scale-[1.01] ${
+            <div className={`max-w-[80%] px-8 py-5 rounded-[2.5rem] text-base leading-relaxed shadow-2xl transition-all duration-500 ease-out hover:-translate-y-1 ${
               msg.role === 'user' 
-              ? 'bg-gradient-to-br from-emerald-500/80 to-emerald-900/80 backdrop-blur-3xl text-white rounded-tr-none border border-emerald-400/20' 
-              : 'bg-gradient-to-br from-white/[0.08] to-white/[0.03] backdrop-blur-3xl text-slate-200 rounded-tl-none border border-white/10'
+              ? 'bg-gradient-to-br from-emerald-500/80 to-emerald-900/80 backdrop-blur-3xl text-white rounded-tr-none border border-emerald-400/20 hover:shadow-emerald-500/20 hover:border-emerald-400/40' 
+              : 'bg-gradient-to-br from-white/[0.08] to-white/[0.03] backdrop-blur-3xl text-slate-200 rounded-tl-none border border-white/10 hover:shadow-white/5 hover:border-white/20 hover:bg-white/[0.12]'
             }`}>
               {msg.content}
               {msg.blocks && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {msg.blocks.map(block => (
-                    <span key={block} className="text-[10px] px-3 py-1 rounded-full bg-slate-950/50 text-emerald-400 border border-emerald-500/10 font-bold">
+                    <span key={block} className="text-[10px] px-3 py-1 rounded-full bg-slate-950/50 text-emerald-400 border border-emerald-500/10 font-bold transition-all duration-300 hover:scale-105 hover:bg-emerald-500/20 hover:border-emerald-500/30 cursor-default">
                       #{block}
                     </span>
                   ))}
