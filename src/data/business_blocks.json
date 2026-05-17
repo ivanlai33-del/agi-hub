@@ -1,5 +1,172 @@
 [
   {
+    "block_id": "web_scraper_core",
+    "name": "🕷️ 網路爬蟲核心積木 (Scrapling)",
+    "strategy": "TOOL_CALL",
+    "handoff_policy": "enrich_and_return",
+    "used_by": [
+      "brain:real_estate_analyst_v1",
+      "brain:scrapling_commander_v1",
+      "brain:gov_tender_strategist",
+      "brain:growth_hacker_v1",
+      "brain:seo_specialist",
+      "brain:legal_advisor_pro",
+      "brain:ceo_strategist"
+    ],
+    "tools": [
+      {
+        "name": "scrape_static",
+        "endpoint": "http://localhost:8088/scrape",
+        "mode": "static",
+        "description": "快速抓取靜態頁面，適合無反爬機制的政府或新聞網站"
+      },
+      {
+        "name": "scrape_stealthy",
+        "endpoint": "http://localhost:8088/scrape",
+        "mode": "stealthy",
+        "description": "隱匿模式，用於有 Cloudflare 防護的租屋、購物平台"
+      },
+      {
+        "name": "scrape_dynamic",
+        "endpoint": "http://localhost:8088/scrape",
+        "mode": "dynamic",
+        "description": "完整瀏覽器模式，處理 SPA 與需要 JavaScript 執行的頁面"
+      },
+      {
+        "name": "scrape_batch",
+        "endpoint": "http://localhost:8088/scrape/batch",
+        "mode": "stealthy",
+        "description": "批次爬取多個 URL，適合 Multica Cron 定時任務"
+      }
+    ],
+    "rules": [
+      "優先使用 scrape_static，只有靜態失效才升級到 stealthy",
+      "回傳 Markdown 格式，去除廣告與導航列",
+      "每個域名最高 3 req/s，遵守合理爬取間隔",
+      "爬取結果必須標注來源 URL 與時間戳記"
+    ],
+    "wiki": "docs/web-scraper-playbook.md",
+    "bd_value": "critical",
+    "fallback": ["inform_user_of_scrape_failure"]
+  },
+  {
+    "block_id": "re_historical_query",
+    "name": "🏠 實價登錄歷史查詢積木",
+    "strategy": "DB_QUERY",
+    "handoff_policy": "enrich_and_return",
+    "used_by": ["brain:real_estate_analyst_v1"],
+    "tools": [
+      {
+        "name": "supabase_query",
+        "endpoint": "/api/v1/lvr",
+        "table": "lvr_trades",
+        "description": "查詢全台 22 縣市買賣成交記錄，計算均價/中位數/趨勢"
+      },
+      {
+        "name": "supabase_query_rentals",
+        "endpoint": "/api/v1/lvr",
+        "table": "lvr_rentals",
+        "description": "查詢租賃成交記錄，計算各區租金行情"
+      }
+    ],
+    "entry_signals": [
+      "實價登錄", "成交行情", "這個社區賣多少", "附近房價",
+      "最近幾年房價趨勢", "均價多少", "賣多少錢"
+    ],
+    "output_format": {
+      "median_price": "number",
+      "avg_price": "number",
+      "trend_8q": "array",
+      "sample_count": "number",
+      "period": "string"
+    },
+    "wiki": "docs/real-estate-query-playbook.md",
+    "bd_value": "high"
+  },
+  {
+    "block_id": "re_live_market_scan",
+    "name": "🔍 即時市場掃描積木",
+    "strategy": "TOOL_CALL",
+    "handoff_policy": "enrich_and_return",
+    "used_by": ["brain:real_estate_analyst_v1"],
+    "tools": [
+      {
+        "name": "scrape_stealthy",
+        "target_domains": ["591.com.tw", "sinyi.com.tw", "yungching.com.tw"],
+        "description": "即時爬取各大平台當前掛牌物件"
+      }
+    ],
+    "entry_signals": [
+      "現在有什麼在賣", "最新掛牌", "這個價錢買得到嗎",
+      "急售物件", "最近上架", "有沒有便宜的"
+    ],
+    "output_format": {
+      "listings": "array",
+      "avg_asking_price": "number",
+      "spread_vs_historical": "percent"
+    },
+    "wiki": "docs/live-market-scan-playbook.md",
+    "bd_value": "high"
+  },
+  {
+    "block_id": "re_roi_calculator",
+    "name": "📊 投報率試算積木",
+    "strategy": "FORMULA",
+    "handoff_policy": "enrich_and_return",
+    "used_by": ["brain:real_estate_analyst_v1"],
+    "formulas": {
+      "gross_yield": "(annual_rent / purchase_price) * 100",
+      "net_yield": "((annual_rent - annual_costs) / purchase_price) * 100",
+      "breakeven_years": "purchase_price / annual_net_income"
+    },
+    "entry_signals": [
+      "投報率多少", "這樣買划不划算", "貸款試算",
+      "何時回本", "值得投資嗎", "報酬率"
+    ],
+    "wiki": "docs/roi-calculator-playbook.md",
+    "bd_value": "medium"
+  },
+  {
+    "block_id": "gov_tender_scraper",
+    "name": "🏛️ 政府標案爬取積木",
+    "strategy": "TOOL_CALL",
+    "handoff_policy": "enrich_and_return",
+    "used_by": ["brain:gov_tender_strategist"],
+    "tools": [
+      {
+        "name": "scrape_static",
+        "target_domains": ["pcc.gov.tw", "lis.ly.gov.tw"],
+        "description": "爬取政府採購網最新標案公告"
+      }
+    ],
+    "entry_signals": [
+      "最新標案", "有沒有適合的案子", "政府採購", "招標公告"
+    ],
+    "wiki": "docs/gov-tender-playbook.md",
+    "bd_value": "high",
+    "fallback": ["human_handoff"]
+  },
+  {
+    "block_id": "legal_reg_scraper",
+    "name": "⚖️ 法規即時爬取積木",
+    "strategy": "TOOL_CALL",
+    "handoff_policy": "enrich_and_return",
+    "used_by": ["brain:legal_advisor_pro"],
+    "tools": [
+      {
+        "name": "scrape_static",
+        "target_domains": ["law.moj.gov.tw", "mol.gov.tw", "fsc.gov.tw"],
+        "description": "爬取全國法規資料庫與主管機關最新公告"
+      }
+    ],
+    "entry_signals": [
+      "最新法規", "有沒有修法", "目前規定", "勞基法", "公司法"
+    ],
+    "disclaimer": "AI 回答不構成法律建議，以官方最新版本為準。",
+    "wiki": "docs/legal-reg-playbook.md",
+    "bd_value": "medium"
+  },
+  {
     "block_id": "booking_core",
     "name": "預約核心積木",
     "strategy": "REFINING",

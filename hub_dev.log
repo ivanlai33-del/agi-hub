@@ -1,0 +1,87 @@
+
+> agi-navigation-hub@1.0.0 dev
+> next dev -p 3033
+
+  ▲ Next.js 14.2.3
+  - Local:        http://localhost:3033
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 3.6s
+ ✓ Compiled /src/middleware in 207ms (73 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 1747ms (1242 modules)
+ GET / 200 in 2014ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 825ms (1245 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 886ms
+ ✓ Compiled /api/auth/session in 293ms (654 modules)
+ ✓ Compiled (661 modules)
+ GET /api/auth/session 200 in 706ms
+ GET /api/v1/brains 200 in 713ms
+ GET /api/auth/session 200 in 47ms
+ GET /api/v1/brains 200 in 55ms
+ ✓ Compiled /board in 494ms (1294 modules)
+ GET /api/v1/multica 404 in 110ms
+ GET /api/v1/multica 404 in 20ms
+ GET /api/auth/session 200 in 20ms
+ GET /api/v1/brains 200 in 82ms
+ GET /api/auth/session 200 in 14ms
+ GET /api/v1/brains 200 in 65ms
+ ✓ Compiled /registry in 260ms (1316 modules)
+ GET /api/auth/session 200 in 80ms
+ GET /api/v1/brains 200 in 82ms
+ GET /api/auth/session 200 in 8ms
+ GET /api/v1/brains 200 in 61ms
+ GET /registry 200 in 42ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 22ms
+ GET /api/auth/session 200 in 20ms
+ GET /api/auth/session 200 in 19ms
+ GET /api/v1/brains 200 in 120ms
+ GET /api/v1/brains 200 in 120ms
+ GET / 200 in 31ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 16ms
+ GET /api/auth/session 200 in 11ms
+ GET /api/v1/brains 200 in 62ms
+ GET /api/auth/session 200 in 21ms
+ GET /api/v1/brains 200 in 76ms
+ ✓ Compiled /api/v1/navigate in 91ms (681 modules)
+[AGI HUB] Google API Result: {
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "您好。我是 AGI 導航核心所派遣的通用助手。\n\n我已準備好為您提供全方位的導航與支援。無論您需要整理資訊、撰寫內容，或是設計全新的專業功能大腦，我都能為您服務。\n\n請告知我您目前的任務或需求。\n\n1. 執行一般對話與諮詢\n2. 協助特定任務處理\n3. 開發與訓練新的 AI 模組\n\n我將隨時待命，請指示下一步。",
+            "thoughtSignature": "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"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 402,
+    "candidatesTokenCount": 109,
+    "totalTokenCount": 1323,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 402
+      }
+    ],
+    "thoughtsTokenCount": 812
+  },
+  "modelVersion": "gemini-3-flash-preview",
+  "responseId": "n3r5ae-IK7e8vr0PuO3E8AU"
+}
+ POST /api/v1/navigate 200 in 6988ms
+ GET / 200 in 252ms
+ GET /api/v1/brains 200 in 121ms
+ GET /api/auth/session 200 in 182ms
+ GET /api/auth/session 200 in 60ms
+ GET /api/v1/brains 200 in 64ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 25ms
+[?25h

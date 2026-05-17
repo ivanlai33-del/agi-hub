@@ -88,10 +88,18 @@ CREATE_BRAIN:
         });
 
         const result = await response.json();
-        console.log('[AGI HUB] Google API Result:', JSON.stringify(result, null, 2));
+        
+        // 金鑰脫敏防護：確保日誌與回傳錯誤中絕不包含明文 API Key
+        const sanitizeText = (text: string) => {
+            if (!apiKey) return text;
+            return text.split(apiKey).join('[REDACTED_API_KEY]');
+        };
+
+        console.log('[AGI HUB] Google API Result:', sanitizeText(JSON.stringify(result, null, 2)));
 
         if (!response.ok) {
-            return NextResponse.json({ error: 'LLM Error', details: result }, { status: response.status });
+            const sanitizedDetails = JSON.parse(sanitizeText(JSON.stringify(result)));
+            return NextResponse.json({ error: 'LLM Error', details: sanitizedDetails }, { status: response.status });
         }
 
         return NextResponse.json({ 
@@ -101,6 +109,9 @@ CREATE_BRAIN:
         });
 
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        const apiKey = (process.env.AGI_HUB_GEMINI_KEY || "").trim();
+        const errorMessage = error?.message || "";
+        const sanitizedError = apiKey ? errorMessage.split(apiKey).join('[REDACTED_API_KEY]') : errorMessage;
+        return NextResponse.json({ error: sanitizedError }, { status: 500 });
     }
 }

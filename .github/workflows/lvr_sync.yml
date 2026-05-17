@@ -1,0 +1,36 @@
+name: LVR Real Estate Quarterly Sync
+
+on:
+  schedule:
+    # 每年 2月、5月、8月、11月的 15日凌晨 2點執行 (配合內政部實價登錄季報更新節奏)
+    - cron: '0 2 15 2,5,8,11 *'
+  workflow_dispatch: # 支援手動觸發
+
+jobs:
+  sync_lvr_data:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install supabase pandas python-dotenv requests
+
+      - name: Run LVR Import Script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          echo "Starting LVR Quarterly Data Import..."
+          # 自動執行最新一季的六都資料同步
+          python scripts/import_lvr.py --latest --all-cities
+          echo "Sync Completed Successfully!"

@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, User, Brain, Shield, Menu, X, ArrowRight, LayoutGrid, Globe, Settings, LogOut, Plus } from 'lucide-react';
+import { Send, Sparkles, User, Brain, Shield, Menu, X, ArrowRight, LayoutGrid, Globe, Settings, LogOut, Plus, Kanban } from 'lucide-react';
+import { CompanyKanban } from './CompanyKanban';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { GenUIInterceptor } from '../genui/GenUIInterceptor';
 
 interface Message {
   role: 'user' | 'agi';
@@ -24,6 +26,7 @@ export const PureChat: React.FC = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isBoardOpen, setIsBoardOpen] = useState(false);
   const [activeBrain, setActiveBrain] = useState<any>(null);
   const [brains, setBrains] = useState<any[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -130,20 +133,34 @@ export const PureChat: React.FC = () => {
         const parts = content.split('CREATE_BRAIN:');
         content = parts[0].trim();
         try {
-          // Find the start of the JSON block
           const jsonStr = parts[1].trim();
           const brainData = JSON.parse(jsonStr);
-          // Call API to persist the new brain
           await fetch('/api/v1/brains', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(brainData),
           });
-          // Use window.dispatchEvent or similar if we want to notify other components
-          // For now, toast is enough
           import('sonner').then(({ toast }) => toast.success(`新大腦「${brainData.name}」已自動存入智庫`));
         } catch (e) {
           console.error('Failed to parse auto-created brain', e);
+        }
+      }
+
+      // Check for Multica Task trigger
+      if (content.includes('CREATE_TASK:')) {
+        const parts = content.split('CREATE_TASK:');
+        content = parts[0].trim();
+        try {
+          const jsonStr = parts[1].trim();
+          const taskData = JSON.parse(jsonStr);
+          await fetch('/api/v1/multica', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(taskData),
+          });
+          import('sonner').then(({ toast }) => toast.success(`任務「${taskData.title}」已推送至 Multica 生產線`));
+        } catch (e) {
+          console.error('Failed to parse auto-created task', e);
         }
       }
 
@@ -240,6 +257,7 @@ export const PureChat: React.FC = () => {
 
             <nav className="grid grid-cols-1 gap-4">
               {[
+                { id: 'board', label: '生產指揮中心', href: '/board', color: 'hover:text-cyan-400', adminOnly: false },
                 { id: 'registry', label: '職人大腦智庫', href: '/registry', color: 'hover:text-emerald-400', adminOnly: true },
                 { id: 'assets', label: '連線資產清單', href: '/assets', color: 'hover:text-cyan-400', adminOnly: true },
                 { id: 'users', label: '人員帳號管理', href: '/users', color: 'hover:text-amber-400', adminOnly: true },
@@ -284,6 +302,14 @@ export const PureChat: React.FC = () => {
             }`}
             title={activeBrain ? `Active Brain: ${activeBrain.name}` : 'Click to select Brain identity'}
           />
+
+          <button 
+            onClick={() => setIsBoardOpen(!isBoardOpen)}
+            className={`p-2 rounded-xl transition-all duration-500 ${isBoardOpen ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50' : 'bg-white/5 text-slate-500 hover:text-emerald-400'}`}
+            title="Toggle Company Board"
+          >
+            <Kanban size={16} />
+          </button>
           
           {showResetX && activeBrain && (
             <button 
@@ -347,9 +373,9 @@ export const PureChat: React.FC = () => {
             <div className={`max-w-[80%] px-8 py-5 rounded-[2.5rem] text-base leading-relaxed shadow-2xl transition-all duration-500 ease-out hover:-translate-y-1 ${
               msg.role === 'user' 
               ? 'bg-gradient-to-br from-emerald-500/80 to-emerald-900/80 backdrop-blur-3xl text-white rounded-tr-none border border-emerald-400/20 hover:shadow-emerald-500/20 hover:border-emerald-400/40' 
-              : 'bg-gradient-to-br from-white/[0.08] to-white/[0.03] backdrop-blur-3xl text-slate-200 rounded-tl-none border border-white/10 hover:shadow-white/5 hover:border-white/20 hover:bg-white/[0.12]'
+              : 'bg-gradient-to-br from-white/[0.08] to-white/[0.03] backdrop-blur-3xl text-slate-200 rounded-tl-none border border-white/10 hover:shadow-white/5 hover:border-white/20 hover:bg-white/[0.12] w-full'
             }`}>
-              {msg.content}
+              {msg.role === 'agi' ? <GenUIInterceptor content={msg.content} /> : msg.content}
               {msg.blocks && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {msg.blocks.map(block => (
@@ -400,6 +426,21 @@ export const PureChat: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* Multica Board Overlay */}
+      {isBoardOpen && (
+        <div className="fixed inset-0 z-[80] bg-slate-950/40 backdrop-blur-3xl animate-in zoom-in-95 duration-500 flex items-center justify-center p-4 sm:p-8">
+          <div className="w-full max-w-5xl h-[80vh] relative">
+            <button 
+              onClick={() => setIsBoardOpen(false)}
+              className="absolute -top-12 right-0 p-2 text-slate-500 hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+            <CompanyKanban />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

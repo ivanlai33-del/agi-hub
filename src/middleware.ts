@@ -5,8 +5,13 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get('agi_hub_session')?.value;
   const { pathname } = request.nextUrl;
 
-  // 1. 公開路徑 (登入頁面、API 認證路徑)
-  if (pathname.startsWith('/login') || pathname.startsWith('/api/auth/login')) {
+  // 1. 公開路徑 (登入頁面、API 認證路徑、實價登錄展示與查詢 API)
+  if (
+    pathname.startsWith('/login') || 
+    pathname.startsWith('/api/auth/login') ||
+    pathname.startsWith('/api/v1/lvr') || 
+    pathname.startsWith('/lvr-demo')
+  ) {
     return NextResponse.next();
   }
 
