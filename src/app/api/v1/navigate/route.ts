@@ -13,7 +13,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Config Error: AGI_HUB_GEMINI_KEY missing' }, { status: 500 });
         }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+        // 升級至 2026 年最新旗艦模型 Gemini 2.5 Flash，享有極致速度與頂級推理能力
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
         // Construct System Context based on the dispatched brain
         const systemPrompt = `
