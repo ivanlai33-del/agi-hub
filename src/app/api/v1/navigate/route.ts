@@ -58,21 +58,38 @@ CREATE_BRAIN:
 }
         `;
 
-        // Map history to Gemini contents format
-        let history = (messages || []).map((m: any) => ({
-            role: m.role === 'user' ? 'user' : 'model',
-            parts: [{ text: m.content }]
-        }));
-        
-        // Google Gemini API requires the first message in history to be from 'user'
-        if (history.length > 0 && history[0].role === 'model') {
-            history.shift();
+        // Map history to Gemini contents format with strict role alternation filtering
+        let rawHistory = (messages || [])
+            .filter((m: any) => m && m.content && typeof m.content === 'string' && m.content.trim().length > 0)
+            .map((m: any) => ({
+                role: m.role === 'user' ? 'user' : 'model',
+                parts: [{ text: m.content.trim() }]
+            }));
+
+        // Google Gemini API 嚴格交替規則防護 (user -> model -> user -> model)
+        let history: any[] = [];
+        for (const item of rawHistory) {
+            if (history.length === 0) {
+                if (item.role === 'user') {
+                    history.push(item);
+                }
+            } else {
+                const lastRole = history[history.length - 1].role;
+                if (item.role !== lastRole) {
+                    history.push(item);
+                } else {
+                    // 若角色重複 (如連續兩個 user 或連續兩個 model)，將文字內容合併至上一筆，避免 400 崩潰
+                    history[history.length - 1].parts[0].text += `\n\n${item.parts[0].text}`;
+                }
+            }
         }
-        
+
+        // 若經過濾後歷史紀錄為空 (例如只有 model 訊息)，強制塞入一筆 user 起始請求
         if (history.length === 0) {
+            const fallbackText = typeof payload === 'string' ? payload : (payload?.text || "您好，請協助導航");
             history = [{
                 role: 'user',
-                parts: [{ text: typeof payload === 'string' ? payload : (payload?.text || "Hello") }]
+                parts: [{ text: fallbackText.trim() || "您好" }]
             }];
         }
 
